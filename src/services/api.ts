@@ -51,6 +51,14 @@ export interface ProjectInquiry {
   updated_at: string;
 }
 
+export interface ContactSubmission {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: {
@@ -541,6 +549,68 @@ class ApiService {
       .sort((a, b) => b.count - a.count);
 
     return stats;
+  }
+
+  // Contact Submissions methods
+  async getContactSubmissions(): Promise<ContactSubmission[]> {
+    if (!this.token) throw new Error('Authentication required');
+
+    const { data, error } = await supabase
+      .from('contact_submissions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw new Error('Failed to fetch contact submissions');
+    return data;
+  }
+
+  async getContactSubmission(id: number): Promise<ContactSubmission> {
+    if (!this.token) throw new Error('Authentication required');
+
+    const { data, error } = await supabase
+      .from('contact_submissions')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw new Error('Contact submission not found');
+    return data;
+  }
+
+  async deleteContactSubmission(id: number): Promise<void> {
+    if (!this.token) throw new Error('Authentication required');
+
+    const { error } = await supabase
+      .from('contact_submissions')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw new Error('Failed to delete contact submission');
+  }
+
+  // Email notification method
+  async sendEmailNotification(type: 'contact' | 'inquiry', data: any): Promise<void> {
+    try {
+      // Use Netlify Functions endpoint
+      const response = await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type,
+          data,
+          recipient: 'blutech18@gmail.com'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email notification');
+      }
+    } catch (error) {
+      console.error('Email notification error:', error);
+      // Don't throw error to prevent form submission failure
+    }
   }
 
   isAuthenticated(): boolean {

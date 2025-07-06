@@ -22,16 +22,17 @@ import {
   Clock,
   DollarSign
 } from 'lucide-react';
-import { api, Project, ProjectInquiry } from '../services/api';
+import { api, Project, ProjectInquiry, ContactSubmission } from '../services/api';
 import { useToast } from '../hooks/useToast';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
 import ToastContainer from '../components/ToastContainer';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'projects' | 'inquiries' | 'stats'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'inquiries' | 'contacts' | 'stats'>('projects');
   const [projects, setProjects] = useState<Project[]>([]);
   const [inquiries, setInquiries] = useState<ProjectInquiry[]>([]);
+  const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showInquiryModal, setShowInquiryModal] = useState(false);
@@ -53,17 +54,19 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [projectsData, inquiriesData, nextClientIdData] = await Promise.all([
+      const [projectsData, inquiriesData, contactsData, nextClientIdData] = await Promise.all([
         api.getProjects(),
         api.getInquiries(),
+        api.getContactSubmissions(),
         api.getNextClientId()
       ]);
       setProjects(projectsData);
       setInquiries(inquiriesData);
+      setContactSubmissions(contactsData);
       setNextClientId(nextClientIdData.nextId);
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      showError('Failed to load data', 'Unable to fetch projects and inquiries. Please try again.');
+      showError('Failed to load data', 'Unable to fetch projects, inquiries, and contact messages. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -158,6 +161,29 @@ const AdminDashboard = () => {
     );
   };
 
+  const handleDeleteContact = async (contact: ContactSubmission) => {
+    showConfirmDialog(
+      {
+        title: 'Delete Contact Message',
+        message: 'Are you sure you want to permanently delete this contact message? This action cannot be undone.',
+        confirmText: 'Delete Message',
+        cancelText: 'Keep Message',
+        type: 'danger',
+        itemName: `${contact.name} - ${contact.email}`
+      },
+      async () => {
+        try {
+          await api.deleteContactSubmission(contact.id);
+          setContactSubmissions(contactSubmissions.filter(c => c.id !== contact.id));
+          success('Contact message deleted', 'Contact message has been successfully removed.');
+        } catch (error) {
+          showError('Delete failed', 'Unable to delete contact message. Please try again.');
+          throw error;
+        }
+      }
+    );
+  };
+
   const handleUpdateInquiryStatus = async (inquiry: ProjectInquiry, status: string) => {
     try {
       const updatedInquiry = await api.updateInquiry(inquiry.id, { 
@@ -173,6 +199,7 @@ const AdminDashboard = () => {
   const stats = {
     totalProjects: projects.length,
     totalInquiries: inquiries.length,
+    totalContacts: contactSubmissions.length,
     webProjects: projects.filter(p => p.category === 'web').length,
     mobileProjects: projects.filter(p => p.category === 'mobile').length,
     desktopProjects: projects.filter(p => p.category === 'desktop').length,
@@ -192,16 +219,20 @@ const AdminDashboard = () => {
       <header className="bg-navy-800 border-b border-navy-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <img src="/blutech.svg" alt="BluTech" className="w-8 h-8 mr-3" />
-              <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
+            <div className="flex items-center min-w-0">
+              <img src="/blutech.svg" alt="BluTech" className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 flex-shrink-0" />
+              <h1 className="text-lg sm:text-xl font-bold text-white truncate">
+                <span className="hidden sm:inline">Admin Dashboard</span>
+                <span className="sm:hidden">Admin</span>
+              </h1>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center text-gray-400 hover:text-white transition-colors"
+              className="flex items-center text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
             >
-              <LogOut size={20} className="mr-2" />
-              Logout
+              <LogOut size={16} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Logout</span>
+              <span className="sm:hidden">Exit</span>
             </button>
           </div>
         </div>
@@ -209,39 +240,57 @@ const AdminDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs */}
-        <div className="flex space-x-4 mb-8">
+        <div className="flex flex-wrap gap-2 sm:gap-4 mb-8">
           <button
             onClick={() => setActiveTab('projects')}
-            className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
               activeTab === 'projects' 
                 ? 'bg-primary-500 text-white' 
                 : 'bg-navy-800 text-gray-400 hover:text-white'
             }`}
           >
-            <FolderOpen size={20} className="mr-2" />
-            Projects ({projects.length})
+            <FolderOpen size={16} className="mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Projects</span>
+            <span className="sm:hidden">Proj</span>
+            <span className="ml-1">({projects.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('inquiries')}
-            className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
               activeTab === 'inquiries' 
                 ? 'bg-primary-500 text-white' 
                 : 'bg-navy-800 text-gray-400 hover:text-white'
             }`}
           >
-            <FolderOpen size={20} className="mr-2" />
-            Inquiries ({inquiries.length})
+            <FileText size={16} className="mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Inquiries</span>
+            <span className="sm:hidden">Inq</span>
+            <span className="ml-1">({inquiries.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('contacts')}
+            className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
+              activeTab === 'contacts' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-navy-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            <Mail size={16} className="mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Messages</span>
+            <span className="sm:hidden">Msg</span>
+            <span className="ml-1">({contactSubmissions.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('stats')}
-            className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
               activeTab === 'stats' 
                 ? 'bg-primary-500 text-white' 
                 : 'bg-navy-800 text-gray-400 hover:text-white'
             }`}
           >
-            <BarChart3 size={20} className="mr-2" />
-            Statistics
+            <BarChart3 size={16} className="mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Statistics</span>
+            <span className="sm:hidden">Stats</span>
           </button>
         </div>
 
@@ -252,63 +301,75 @@ const AdminDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white">Projects</h2>
-              <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Projects</h2>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 <button
                   onClick={() => {
                     setEditingProject(null);
                     setShowProjectModal(true);
                   }}
-                  className="btn-primary flex items-center"
+                  className="btn-primary flex items-center justify-center text-sm sm:text-base"
                 >
-                  <Plus size={20} className="mr-2" />
-                  Add Project
+                  <Plus size={16} className="mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Add Project</span>
+                  <span className="sm:hidden">Add</span>
                 </button>
                 <button
                   onClick={handleRenumberAll}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base"
                   title="Renumber all clients sequentially to remove gaps after deletions"
                 >
-                  🔢 Fix Client Numbers
+                  🔢 <span className="ml-1 hidden sm:inline">Fix Client Numbers</span>
+                  <span className="ml-1 sm:hidden">Fix Numbers</span>
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {projects.map((project) => (
                 <div key={project.id} className="card overflow-hidden">
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-32 sm:h-48 object-cover"
                   />
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold text-white mb-2">{project.title}</h3>
-                    <p className="text-gray-400 text-sm mb-3 line-clamp-2">{project.description}</p>
-                    <div className="flex flex-wrap mb-3">
-                      {project.technologies.map((tech) => (
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-1">{project.title}</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm mb-3 line-clamp-2">{project.description}</p>
+                    <div className="flex flex-wrap mb-3 gap-1">
+                      {project.technologies.slice(0, 3).map((tech) => (
                         <span key={tech} className="tech-tag text-xs">
                           {tech}
                         </span>
                       ))}
+                      {project.technologies.length > 3 && (
+                        <span className="tech-tag text-xs">+{project.technologies.length - 3}</span>
+                      )}
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => {
-                          setEditingProject(project);
-                          setShowProjectModal(true);
-                        }}
-                        className="text-blue-400 hover:text-blue-300 p-1"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProject(project)}
-                        className="text-red-400 hover:text-red-300 p-1"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            setEditingProject(project);
+                            setShowProjectModal(true);
+                          }}
+                          className="text-blue-400 hover:text-blue-300 p-1"
+                          title="Edit Project"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProject(project)}
+                          className="text-red-400 hover:text-red-300 p-1"
+                          title="Delete Project"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {project.category}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -324,7 +385,7 @@ const AdminDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h2 className="text-2xl font-bold text-white">Project Inquiries</h2>
               <div className="text-sm text-gray-400">
                 {inquiries.filter(i => i.status === 'pending').length} pending inquiries
@@ -332,108 +393,199 @@ const AdminDashboard = () => {
             </div>
 
             <div className="bg-navy-800 rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-navy-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Client Info
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Project Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Budget
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-navy-700">
-                  {inquiries.map((inquiry) => (
-                    <tr key={inquiry.id} className="hover:bg-navy-750 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-white">{inquiry.name}</div>
-                          <div className="text-sm text-gray-400">{inquiry.email}</div>
-                          {inquiry.phone && (
-                            <div className="text-xs text-gray-500">{inquiry.phone}</div>
-                          )}
-                          {inquiry.company && (
-                            <div className="text-xs text-gray-500">{inquiry.company}</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div>
-                          {inquiry.service_type && (
-                            <div className="text-sm text-white">{inquiry.service_type}</div>
-                          )}
-                          {inquiry.project_type && (
-                            <div className="text-xs text-gray-400">{inquiry.project_type}</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {inquiry.budget_range || 'Not specified'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={inquiry.status}
-                          onChange={(e) => handleUpdateInquiryStatus(inquiry, e.target.value)}
-                          className={`text-xs px-2 py-1 rounded-full font-semibold bg-navy-900 border ${
-                            inquiry.status === 'pending' ? 'text-yellow-400 border-yellow-400' :
-                            inquiry.status === 'in_progress' ? 'text-blue-400 border-blue-400' :
-                            inquiry.status === 'completed' ? 'text-green-400 border-green-400' :
-                            'text-red-400 border-red-400'
-                          }`}
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="in_progress">In Progress</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {new Date(inquiry.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => {
-                              setViewingInquiry(inquiry);
-                              setShowInquiryModal(true);
-                            }}
-                            className="text-blue-400 hover:text-blue-300"
-                            title="View Details"
-                          >
-                            <FolderOpen size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteInquiry(inquiry)}
-                            className="text-red-400 hover:text-red-300"
-                            title="Delete Inquiry"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[800px]">
+                  <thead className="bg-navy-700">
+                    <tr>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Client Info
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Project Type
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Budget
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-navy-700">
+                    {inquiries.map((inquiry) => (
+                      <tr key={inquiry.id} className="hover:bg-navy-750 transition-colors">
+                        <td className="px-3 sm:px-6 py-4">
+                          <div>
+                            <div className="text-sm font-medium text-white">{inquiry.name}</div>
+                            <div className="text-sm text-gray-400">{inquiry.email}</div>
+                            {inquiry.phone && (
+                              <div className="text-xs text-gray-500">{inquiry.phone}</div>
+                            )}
+                            {inquiry.company && (
+                              <div className="text-xs text-gray-500">{inquiry.company}</div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4">
+                          <div>
+                            {inquiry.service_type && (
+                              <div className="text-sm text-white">{inquiry.service_type}</div>
+                            )}
+                            {inquiry.project_type && (
+                              <div className="text-xs text-gray-400">{inquiry.project_type}</div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {inquiry.budget_range || 'Not specified'}
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                          <select
+                            value={inquiry.status}
+                            onChange={(e) => handleUpdateInquiryStatus(inquiry, e.target.value)}
+                            className={`text-xs px-2 py-1 rounded-full font-semibold bg-navy-900 border ${
+                              inquiry.status === 'pending' ? 'text-yellow-400 border-yellow-400' :
+                              inquiry.status === 'in_progress' ? 'text-blue-400 border-blue-400' :
+                              inquiry.status === 'completed' ? 'text-green-400 border-green-400' :
+                              'text-red-400 border-red-400'
+                            }`}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {new Date(inquiry.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => {
+                                setViewingInquiry(inquiry);
+                                setShowInquiryModal(true);
+                              }}
+                              className="text-blue-400 hover:text-blue-300"
+                              title="View Details"
+                            >
+                              <FolderOpen size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteInquiry(inquiry)}
+                              className="text-red-400 hover:text-red-300"
+                              title="Delete Inquiry"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               
               {inquiries.length === 0 && (
                 <div className="text-center py-12">
                   <FolderOpen size={48} className="mx-auto text-gray-500 mb-4" />
                   <h3 className="text-lg font-medium text-gray-400 mb-2">No inquiries yet</h3>
                   <p className="text-gray-500">Project inquiries will appear here when submitted.</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Contact Messages Tab */}
+        {activeTab === 'contacts' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <h2 className="text-2xl font-bold text-white">Contact Messages</h2>
+              <div className="text-sm text-gray-400">
+                {contactSubmissions.length} total messages
+              </div>
+            </div>
+
+            <div className="bg-navy-800 rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead className="bg-navy-700">
+                    <tr>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Contact Info
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Message
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-navy-700">
+                    {contactSubmissions.map((contact) => (
+                      <tr key={contact.id} className="hover:bg-navy-750 transition-colors">
+                        <td className="px-3 sm:px-6 py-4">
+                          <div>
+                            <div className="text-sm font-medium text-white">{contact.name}</div>
+                            <div className="text-sm text-gray-400">
+                              <a href={`mailto:${contact.email}`} className="hover:text-primary-400 transition-colors">
+                                {contact.email}
+                              </a>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4">
+                          <div className="text-sm text-gray-300 max-w-xs">
+                            <p className="line-clamp-3">{contact.message}</p>
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {new Date(contact.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <a
+                              href={`mailto:${contact.email}?subject=Re: Your message&body=Hi ${contact.name},%0D%0A%0D%0AThank you for your message. `}
+                              className="text-blue-400 hover:text-blue-300"
+                              title="Reply via Email"
+                            >
+                              <Mail size={16} />
+                            </a>
+                            <button
+                              onClick={() => handleDeleteContact(contact)}
+                              className="text-red-400 hover:text-red-300"
+                              title="Delete Message"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {contactSubmissions.length === 0 && (
+                <div className="text-center py-12">
+                  <Mail size={48} className="mx-auto text-gray-500 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-400 mb-2">No messages yet</h3>
+                  <p className="text-gray-500">Contact messages will appear here when submitted.</p>
                 </div>
               )}
             </div>
@@ -448,7 +600,7 @@ const AdminDashboard = () => {
             transition={{ duration: 0.3 }}
           >
             <h2 className="text-2xl font-bold text-white mb-6">Statistics</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               <div className="card text-center">
                 <FolderOpen size={48} className="mx-auto text-primary-500 mb-4" />
                 <h3 className="text-2xl font-bold text-white mb-2">{stats.totalProjects}</h3>
@@ -458,6 +610,11 @@ const AdminDashboard = () => {
                 <Users size={48} className="mx-auto text-primary-500 mb-4" />
                 <h3 className="text-2xl font-bold text-white mb-2">{stats.totalInquiries}</h3>
                 <p className="text-gray-400">Total Inquiries</p>
+              </div>
+              <div className="card text-center">
+                <Mail size={48} className="mx-auto text-primary-500 mb-4" />
+                <h3 className="text-2xl font-bold text-white mb-2">{stats.totalContacts}</h3>
+                <p className="text-gray-400">Contact Messages</p>
               </div>
               <div className="card text-center">
                 <BarChart3 size={48} className="mx-auto text-primary-500 mb-4" />

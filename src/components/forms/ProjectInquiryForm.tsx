@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, CheckCircle, AlertCircle, User, Clock, FileText, Plus, Trash2, Mail, Phone, Building, Facebook, Instagram, Music } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useToastContext } from '../../contexts/ToastContext';
+import { api } from '../../services/api';
 
 interface ProjectInquiryFormProps {
   isOpen: boolean;
@@ -258,6 +259,27 @@ const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({
 
       if (!data || data.length === 0) {
         throw new Error('No data returned from submission');
+      }
+
+      // Send email notification
+      try {
+        await api.sendEmailNotification('inquiry', {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company,
+          project_type: formData.project_type,
+          service_type: formData.service_type,
+          budget_range: formData.budget_range,
+          timeline: formData.timeline,
+          description: formData.description,
+          requested_features: formData.requested_features.filter(f => f.trim() !== ''),
+          social_media_links: formData.social_media_links,
+          timestamp: new Date().toISOString()
+        });
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+        // Don't show error to user for email notification failure
       }
 
       setSubmitStatus('success');
