@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -43,10 +43,6 @@ const technologies = [
 ];
 
 const Hero = () => {
-  const { scrollY } = useScroll();
-  const opacity = useTransform(scrollY, [0, 100], [1, 0]);
-  const y = useTransform(scrollY, [0, 100], [0, 20]);
-
   return (
     <section className="relative min-h-screen flex items-center bg-hero-pattern bg-cover bg-center">
       <div className="absolute inset-0 bg-gradient-to-r from-navy-900/90 to-navy-900/70 z-0"></div>
@@ -104,25 +100,7 @@ const Hero = () => {
           </motion.div>
         </div>
 
-        <motion.div 
-          style={{ opacity, y }}
-          className="fixed bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-50"
-        >
-          <motion.span 
-            className="text-gray-400 text-sm mb-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.8 }}
-          >
-            Scroll to explore
-          </motion.span>
-          <motion.div 
-            className="w-0.5 h-16 bg-gradient-to-b from-primary-500 to-transparent"
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-          />
-        </motion.div>
+
       </div>
     </section>
   );

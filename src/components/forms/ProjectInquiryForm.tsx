@@ -349,40 +349,45 @@ const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            <div className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-2xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl mx-4 sm:mx-0">
               {/* Header */}
-              <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 rounded-t-2xl">
+              <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-4 sm:p-6 rounded-t-2xl">
                 <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold">
+                <div className="flex-1 mr-4">
+                    <h2 className="text-lg sm:text-xl lg:text-2xl font-bold">
                       {prefilledService ? `${prefilledService.title} - Project Inquiry` : 'Project Inquiry Form'}
                   </h2>
-                    <p className="text-primary-100 mt-1 text-sm">
+                    <p className="text-primary-100 mt-1 text-xs sm:text-sm">
                       Please provide detailed information about your project requirements
                   </p>
                 </div>
                 <button
                   onClick={handleClose}
                   disabled={isSubmitting}
-                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white hover:text-white transition-colors duration-300 disabled:opacity-50"
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white hover:text-white transition-colors duration-300 disabled:opacity-50 flex-shrink-0"
                 >
-                  <X size={20} />
+                  <X size={16} className="sm:w-5 sm:h-5" />
                 </button>
                 </div>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="p-8 space-y-8">
+              <form onSubmit={handleSubmit} className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
                 {/* Personal Information Section */}
-                <div className="bg-gray-50 dark:bg-navy-800/50 rounded-xl p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                      <User size={18} className="text-white" />
+                <motion.div 
+                  className="bg-gray-50 dark:bg-navy-800/50 rounded-xl p-4 sm:p-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                      <User size={14} className="sm:w-[18px] sm:h-[18px] text-white" />
                     </div>
                     Contact Information
                   </h3>
                   
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Full Name */}
                     <div className="lg:col-span-2">
                       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -568,11 +573,16 @@ const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                                      </div>
+                </motion.div>
 
                 {/* Project Details Section */}
-                <div className="bg-gray-50 dark:bg-navy-800/50 rounded-xl p-6">
+                <motion.div 
+                  className="bg-gray-50 dark:bg-navy-800/50 rounded-xl p-4 sm:p-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                       <FileText size={18} className="text-white" />
@@ -684,80 +694,93 @@ const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({
                   )}
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Requested Features Section */}
-                <div className="bg-gray-50 dark:bg-navy-800/50 rounded-xl p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                      <Plus size={18} className="text-white" />
+                <motion.div 
+                  className="bg-gray-50 dark:bg-navy-800/50 rounded-xl p-4 sm:p-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                      <Plus size={14} className="sm:w-[18px] sm:h-[18px] text-white" />
                     </div>
                     Requested Features
                   </h3>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {formData.requested_features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
-                          <span className="text-primary-600 dark:text-primary-400 text-sm font-semibold">
+                      <div key={index} className="flex items-center gap-3 sm:gap-4 w-full">
+                        <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                          <span className="text-primary-600 dark:text-primary-400 text-xs sm:text-sm font-semibold">
                             {index + 1}
-                        </span>
+                          </span>
                         </div>
                         <input
                           type="text"
                           value={feature}
                           onChange={(e) => handleFeatureChange(index, e.target.value)}
-                          className="flex-1 px-4 py-3 bg-white dark:bg-navy-800 border border-gray-300 dark:border-navy-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/50 transition-all duration-300"
+                          className="flex-1 w-full px-3 py-2 sm:px-4 sm:py-3 bg-white dark:bg-navy-800 border border-gray-300 dark:border-navy-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/50 transition-all duration-300 text-sm sm:text-base"
                           placeholder={`Feature ${index + 1} (e.g., User authentication, Payment integration, etc.)`}
                         />
                         {formData.requested_features.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeFeature(index)}
-                            className="flex-shrink-0 w-10 h-10 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 rounded-lg flex items-center justify-center text-red-500 hover:text-red-600 transition-colors duration-300"
+                            className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 rounded-lg flex items-center justify-center text-red-500 hover:text-red-600 transition-colors duration-300"
                             title="Remove feature"
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={14} className="sm:w-4 sm:h-4" />
                           </button>
                         )}
                       </div>
                     ))}
-                    <div className="flex justify-center pt-4">
+                    <div className="flex justify-center pt-2 sm:pt-4">
                       <button
                         type="button"
                         onClick={addFeature}
-                        className="flex items-center gap-2 px-6 py-3 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-primary-200 dark:border-primary-800 hover:border-primary-300 dark:hover:border-primary-700 rounded-lg text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors duration-300 font-medium"
+                        className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-primary-200 dark:border-primary-800 hover:border-primary-300 dark:hover:border-primary-700 rounded-lg text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors duration-300 font-medium text-sm sm:text-base"
                       >
-                        <Plus size={16} />
+                        <Plus size={14} className="sm:w-4 sm:h-4" />
                         Add Another Feature
                       </button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Submit Section */}
-                <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-navy-700">
+                <motion.div 
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200 dark:border-navy-700"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
                   <motion.button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 sm:gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     whileHover={!isSubmitting ? { scale: 1.02 } : {}}
                     whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        Submitting Inquiry...
+                        <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
+                        <span className="hidden sm:inline">Submitting Inquiry...</span>
+                        <span className="sm:hidden">Submitting...</span>
                       </>
                     ) : submitStatus === 'success' ? (
                       <>
-                        <CheckCircle size={20} />
-                        Inquiry Submitted Successfully!
+                        <CheckCircle size={16} className="sm:w-5 sm:h-5" />
+                        <span className="hidden sm:inline">Inquiry Submitted Successfully!</span>
+                        <span className="sm:hidden">Success!</span>
                       </>
                     ) : (
                       <>
-                        <Send size={20} />
-                        Submit Project Inquiry
+                        <Send size={16} className="sm:w-5 sm:h-5" />
+                        <span className="hidden sm:inline">Submit Project Inquiry</span>
+                        <span className="sm:hidden">Submit</span>
                       </>
                     )}
                   </motion.button>
@@ -765,13 +788,13 @@ const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({
                     type="button"
                     onClick={handleClose}
                     disabled={isSubmitting}
-                    className="px-8 py-4 bg-gray-100 dark:bg-navy-800 hover:bg-gray-200 dark:hover:bg-navy-700 border border-gray-300 dark:border-navy-600 hover:border-gray-400 dark:hover:border-navy-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-3 sm:px-8 sm:py-4 bg-gray-100 dark:bg-navy-800 hover:bg-gray-200 dark:hover:bg-navy-700 border border-gray-300 dark:border-navy-600 hover:border-gray-400 dark:hover:border-navy-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     whileHover={!isSubmitting ? { scale: 1.02 } : {}}
                     whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                   >
                     Cancel
                   </motion.button>
-                </div>
+                </motion.div>
               </form>
             </div>
           </motion.div>

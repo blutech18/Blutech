@@ -488,38 +488,38 @@ const FeaturedServices = () => {
 
         {/* Services Carousel */}
         <div className="relative mt-16">
-          {/* Previous Arrow - Positioned absolutely */}
+          {/* Previous Arrow - Mobile Responsive (40% smaller) */}
           <button
             onClick={prevSlide}
             disabled={totalSlides <= 1 || isTransitioning}
-            className="absolute z-20 w-14 h-14 bg-navy-900/90 backdrop-blur-sm border border-navy-600 rounded-full flex items-center justify-center text-gray-300 hover:text-white hover:bg-navy-700 hover:border-primary-500/50 transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            className="absolute z-20 w-7 h-7 sm:w-8 sm:h-8 bg-navy-900/90 backdrop-blur-sm border border-navy-600 rounded-full flex items-center justify-center text-gray-300 hover:text-white hover:bg-navy-700 hover:border-primary-500/50 transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             style={{ 
-              left: '-32px',
+              left: '-14px',
               top: '50%',
               transform: 'translateY(-50%)',
             }}
             aria-label="Previous services"
           >
-            <ChevronLeft size={22} strokeWidth={2.5} />
+            <ChevronLeft size={14} strokeWidth={2.5} className="sm:w-4 sm:h-4" />
           </button>
 
-          {/* Next Arrow - Positioned absolutely */}
+          {/* Next Arrow - Mobile Responsive (40% smaller) */}
           <button
             onClick={nextSlide}
             disabled={totalSlides <= 1 || isTransitioning}
-            className="absolute z-20 w-14 h-14 bg-navy-900/90 backdrop-blur-sm border border-navy-600 rounded-full flex items-center justify-center text-gray-300 hover:text-white hover:bg-navy-700 hover:border-primary-500/50 transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            className="absolute z-20 w-7 h-7 sm:w-8 sm:h-8 bg-navy-900/90 backdrop-blur-sm border border-navy-600 rounded-full flex items-center justify-center text-gray-300 hover:text-white hover:bg-navy-700 hover:border-primary-500/50 transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             style={{ 
-              right: '-32px',
+              right: '-14px',
               top: '50%',
               transform: 'translateY(-50%)',
             }}
             aria-label="Next services"
           >
-            <ChevronRight size={22} strokeWidth={2.5} />
+            <ChevronRight size={14} strokeWidth={2.5} className="sm:w-4 sm:h-4" />
           </button>
 
-          {/* Services Grid */}
-          <div className="overflow-hidden mx-8">
+          {/* Services Grid - Mobile Enhanced Container */}
+          <div className="overflow-hidden mx-4 sm:mx-6 lg:mx-8">
             <motion.div
               className="flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -529,12 +529,12 @@ const FeaturedServices = () => {
               {Array.from({ length: totalSlides }, (_, slideIndex) => (
                 <div
                   key={slideIndex}
-                  className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                  className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
                 >
                   {services.slice(slideIndex * servicesPerSlide, (slideIndex + 1) * servicesPerSlide).map((service, index) => (
                     <motion.div
                       key={service.id}
-                      className="card h-full flex flex-col p-8 group hover:shadow-2xl transition-all duration-300 border border-navy-700 hover:border-primary-500/30"
+                      className="card h-full flex flex-col p-4 sm:p-6 lg:p-8 group hover:shadow-2xl transition-all duration-300 border border-navy-700 hover:border-primary-500/30"
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -544,44 +544,44 @@ const FeaturedServices = () => {
                         scale: 1.02
                       }}
                     >
-                                             {/* Category Badge */}
-                       <div className="flex justify-between items-start mb-4">
-                         <span className="px-3 py-1 text-xs font-semibold bg-primary-500/20 text-primary-400 rounded-full border border-primary-500/30">
-                           {service.category}
-                         </span>
-                         <div className="transform group-hover:scale-110 transition-transform duration-300">
-                           {typeof service.icon === 'string' ? (
-                             <div className="text-3xl">{service.icon}</div>
-                           ) : (
-                             service.icon
-                           )}
-                         </div>
-                       </div>
-                      
+                      {/* Category Badge */}
+                      <div className="flex justify-between items-start mb-3 sm:mb-4">
+                        <span className="px-2 py-1 sm:px-3 text-xs font-semibold bg-primary-500/20 text-primary-400 rounded-full border border-primary-500/30">
+                          {service.category}
+                        </span>
+                        <div className="transform group-hover:scale-110 transition-transform duration-300">
+                          {typeof service.icon === 'string' ? (
+                            <div className="text-2xl sm:text-3xl">{service.icon}</div>
+                          ) : (
+                            service.icon
+                          )}
+                        </div>
+                      </div>
+                     
                       {/* Title */}
-                      <h3 className="text-xl font-bold mb-3 text-white group-hover:text-primary-400 transition-colors duration-300">
+                      <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white group-hover:text-primary-400 transition-colors duration-300">
                         {service.title}
                       </h3>
-                      
+                     
                       {/* Description */}
-                      <p className="text-gray-400 mb-6 flex-grow text-sm leading-relaxed">
+                      <p className="text-gray-400 mb-4 sm:mb-6 flex-grow text-sm leading-relaxed">
                         {service.description}
                       </p>
-                      
+                     
                       {/* Features */}
-                      <div className="space-y-3 mb-6">
+                      <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                         {service.features.map((feature, featureIndex) => (
                           <div key={featureIndex} className="flex items-center text-xs text-gray-300">
-                            <div className="w-2 h-2 bg-gradient-to-r from-primary-500 to-primary-400 rounded-full mr-3 opacity-80"></div>
+                            <div className="w-2 h-2 bg-gradient-to-r from-primary-500 to-primary-400 rounded-full mr-2 sm:mr-3 opacity-80"></div>
                             <span className="font-medium">{feature}</span>
                           </div>
                         ))}
                       </div>
-                      
+                     
                       {/* Learn More Button */}
                       <motion.button 
                         onClick={() => openServiceModal(service)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-navy-700 to-navy-600 hover:from-primary-500/20 hover:to-primary-600/20 text-gray-300 hover:text-primary-400 rounded-lg transition-all duration-300 text-sm font-semibold border border-navy-600 hover:border-primary-500/50 group"
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 sm:px-4 sm:py-3 bg-gradient-to-r from-navy-700 to-navy-600 hover:from-primary-500/20 hover:to-primary-600/20 text-gray-300 hover:text-primary-400 rounded-lg transition-all duration-300 text-sm font-semibold border border-navy-600 hover:border-primary-500/50 group"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
@@ -596,47 +596,47 @@ const FeaturedServices = () => {
           </div>
         </div>
 
-                 {/* Navigation Indicators */}
-         <div className="flex justify-center items-center mt-12 space-x-4">
-           {Array.from({ length: totalSlides }, (_, index) => (
-             <motion.button
-               key={index}
-               onClick={() => goToSlide(index)}
-               disabled={isTransitioning}
-               className={`relative h-2 transition-all duration-300 rounded-full ${
-                 index === currentSlide 
-                   ? 'w-8 bg-primary-500 shadow-lg shadow-primary-500/50' 
-                   : 'w-2 bg-gray-600 hover:bg-gray-500'
-               }`}
-               whileHover={{ scale: 1.2 }}
-               aria-label={`Navigate to slide ${index + 1}`}
-             />
-           ))}
-         </div>
+        {/* Navigation Indicators - Mobile Enhanced */}
+        <div className="flex justify-center items-center mt-8 sm:mt-12 space-x-3 sm:space-x-4 px-4">
+          {Array.from({ length: totalSlides }, (_, index) => (
+            <motion.button
+              key={index}
+              onClick={() => goToSlide(index)}
+              disabled={isTransitioning}
+              className={`relative h-1.5 sm:h-2 transition-all duration-300 rounded-full touch-manipulation ${
+                index === currentSlide 
+                  ? 'w-6 sm:w-8 bg-primary-500 shadow-lg shadow-primary-500/50' 
+                  : 'w-1.5 sm:w-2 bg-gray-600 hover:bg-gray-500'
+              }`}
+              whileHover={{ scale: 1.2 }}
+              aria-label={`Navigate to slide ${index + 1}`}
+            />
+          ))}
+        </div>
 
-                 {/* Call to Action */}
-         <motion.div 
-           className="text-center mt-16"
-           initial={{ opacity: 0, y: 20 }}
-           whileInView={{ opacity: 1, y: 0 }}
-           viewport={{ once: true }}
-           transition={{ duration: 0.6, delay: 0.3 }}
-         >
-          <h3 className="text-3xl font-bold text-white mb-6">
+        {/* Call to Action - Mobile Enhanced */}
+        <motion.div 
+          className="text-center mt-12 sm:mt-16 px-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">
             Ready to Begin Your Project?
           </h3>
-          <p className="text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-gray-400 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed text-sm sm:text-base">
             From network configuration with Cisco Packet Tracer to comprehensive software development solutions, 
             our expert team delivers professional results that exceed expectations.
           </p>
           <motion.button
             onClick={() => openInquiryForm()}
-            className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary-500/30"
+            className="inline-flex items-center gap-2 sm:gap-3 px-6 py-3 sm:px-10 sm:py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary-500/30 text-sm sm:text-base"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
             Start Your Project Today
-            <ExternalLink size={18} />
+            <ExternalLink size={16} className="sm:w-5 sm:h-5" />
           </motion.button>
         </motion.div>
       </div>
