@@ -4,10 +4,6 @@ on:
   schedule:
     - cron: '*/5 * * * *'  # Every 5 minutes
   workflow_dispatch:  # Manual trigger
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
 
 jobs:
   keep-alive:
@@ -19,7 +15,7 @@ jobs:
       - name: Ping Keep-Alive Endpoint
         run: |
           # Get the domain from environment or use a default
-          DOMAIN="${NETLIFY_DOMAIN:-your-app.netlify.app}"
+          DOMAIN="${NETLIFY_DOMAIN:-blutech18.netlify.app}"
           
           echo "Pinging keep-alive endpoint: https://$DOMAIN/.netlify/functions/keep-alive"
           
@@ -49,7 +45,7 @@ jobs:
       - name: Health Check
         run: |
           # Get the domain from environment or use a default
-          DOMAIN="${NETLIFY_DOMAIN:-your-app.netlify.app}"
+          DOMAIN="${NETLIFY_DOMAIN:-blutech18.netlify.app}"
           
           echo "Performing health check: https://$DOMAIN/.netlify/functions/health"
           
@@ -80,9 +76,9 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#alerts'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   # Optional: Database connectivity test
   db-test:
