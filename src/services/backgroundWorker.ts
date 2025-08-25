@@ -219,23 +219,39 @@ class BackgroundWorker {
    */
   private async collectDatabaseStats(): Promise<void> {
     try {
-      // Get counts from various tables
-      const stats = await Promise.all([
+      // Get counts from various tables - only query tables that exist
+      const stats = await Promise.allSettled([
         supabase.from('projects').select('id', { count: 'exact' }),
         supabase.from('services').select('id', { count: 'exact' }),
-        supabase.from('contact_messages').select('id', { count: 'exact' }),
-        supabase.from('project_inquiries').select('id', { count: 'exact' })
+        supabase.from('users').select('id', { count: 'exact' }),
+        supabase.from('project_inquiries').select('id', { count: 'exact' }),
+        supabase.from('clients').select('id', { count: 'exact' })
       ]);
 
-      const [projects, services, messages, inquiries] = stats;
+      const [projects, services, users, inquiries, clients] = stats;
 
-      console.log('Database statistics:', {
-        projects: projects.count || 0,
-        services: services.count || 0,
-        messages: messages.count || 0,
-        inquiries: inquiries.count || 0,
+      const statsData: any = {
         timestamp: new Date().toISOString()
-      });
+      };
+
+      // Only include successful queries
+      if (projects.status === 'fulfilled' && !projects.value.error) {
+        statsData.projects = projects.value.count || 0;
+      }
+      if (services.status === 'fulfilled' && !services.value.error) {
+        statsData.services = services.value.count || 0;
+      }
+      if (users.status === 'fulfilled' && !users.value.error) {
+        statsData.users = users.value.count || 0;
+      }
+      if (inquiries.status === 'fulfilled' && !inquiries.value.error) {
+        statsData.inquiries = inquiries.value.count || 0;
+      }
+      if (clients.status === 'fulfilled' && !clients.value.error) {
+        statsData.clients = clients.value.count || 0;
+      }
+
+      console.log('Database statistics:', statsData);
     } catch (error) {
       console.error('Statistics collection error:', error);
     }

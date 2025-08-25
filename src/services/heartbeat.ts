@@ -116,22 +116,56 @@ class HeartbeatService {
   private async alternativeHeartbeat(): Promise<void> {
     try {
       // Try to read from existing tables to keep the connection alive
+      // Only query tables that are likely to exist
       const operations = [
         supabase.from('projects').select('id').limit(1),
         supabase.from('services').select('id').limit(1),
-        supabase.from('contact_messages').select('id').limit(1)
+        supabase.from('users').select('id').limit(1),
+        supabase.from('project_inquiries').select('id').limit(1)
       ];
 
-      // Execute at least one operation
-      const result = await operations[0];
-      
-      if (result.error) {
-        throw new Error('All heartbeat operations failed');
+      // Execute operations and handle errors gracefully
+      for (const operation of operations) {
+        try {
+          const result = await operation;
+          if (!result.error) {
+            console.log('Alternative heartbeat successful');
+            this.retryCount = 0;
+            return;
+          }
+        } catch (error) {
+          // Continue to next operation if this one fails
+          continue;
+        }
       }
 
-      console.log('Alternative heartbeat successful');
-      this.retryCount = 0;
+      // If all operations fail, try a simple ping
+      await this.simplePing();
+      
     } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Simple ping method as last resort
+   */
+  private async simplePing(): Promise<void> {
+    try {
+      // Try to access any table or perform a simple operation
+      const { error } = await supabase
+        .from('projects')
+        .select('id')
+        .limit(1);
+
+      if (!error) {
+        console.log('Simple ping successful');
+        this.retryCount = 0;
+      } else {
+        throw new Error('All heartbeat operations failed');
+      }
+    } catch (error) {
+      console.error('Simple ping failed:', error);
       throw error;
     }
   }

@@ -107,7 +107,7 @@ class HealthCheckService {
    */
   private async checkHeartbeatService(): Promise<boolean> {
     try {
-      // Try to access heartbeat logs or perform a simple operation
+      // Try to access existing tables or perform a simple operation
       const { error } = await supabase
         .from('projects')
         .select('id')
