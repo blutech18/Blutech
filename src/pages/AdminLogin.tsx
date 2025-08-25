@@ -27,6 +27,8 @@ const AdminLogin = () => {
     }
   };
 
+
+
   return (
     <div className="min-h-screen bg-navy-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -137,7 +139,7 @@ const AdminLogin = () => {
 
           <div className="text-center">
             <p className="text-gray-400 text-sm">
-              Admin credentials: blutech18 / dededgwapo101403
+              Enter your admin credentials to access the dashboard
             </p>
           </div>
         </motion.form>

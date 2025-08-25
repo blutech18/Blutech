@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
@@ -7,6 +7,7 @@ import Footer from './components/layout/Footer';
 import ScrollToTop from './components/utils/ScrollToTop';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import { ToastProvider } from './contexts/ToastContext';
+import { initializeKeepAlive } from './services/initKeepAlive';
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
@@ -21,6 +22,11 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  // Initialize keep-alive system on app startup
+  useEffect(() => {
+    initializeKeepAlive();
+  }, []);
 
   return (
     <ToastProvider>

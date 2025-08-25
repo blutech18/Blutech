@@ -617,6 +617,8 @@ class ApiService {
     return !!this.token && !!this.user;
   }
 
+
+
   // Helper methods for mapping between API and DB formats
   private mapProjectFromDB(dbProject: any): Project {
     return {
