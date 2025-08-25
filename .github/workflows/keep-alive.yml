@@ -70,21 +70,6 @@ jobs:
             exit 1
           fi
 
-      - name: Check Slack Configuration
-        run: |
-          echo "Checking Slack webhook configuration..."
-          echo "SLACK_CONFIGURED=false" >> $GITHUB_ENV
-          echo "WEBHOOK_URL=" >> $GITHUB_ENV
-          
-          # Note: To enable Slack notifications, add SLACK_WEBHOOK_URL secret
-          # Go to: Settings > Secrets and variables > Actions > New repository secret
-          echo "ℹ️  Slack webhook not configured by default"
-          echo "   To enable Slack notifications:"
-          echo "   1. Go to your repository Settings"
-          echo "   2. Navigate to Secrets and variables > Actions"
-          echo "   3. Add new repository secret: SLACK_WEBHOOK_URL"
-          echo "   4. Set the value to your Slack webhook URL"
-
       # Optional: Slack notification on failure
       # To enable: Add SLACK_WEBHOOK_URL secret in your repository settings
       # Go to: Settings > Secrets and variables > Actions > New repository secret
@@ -94,9 +79,7 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#alerts'
-          webhook_url: ${{ env.WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ env.WEBHOOK_URL }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         continue-on-error: true
 
   # Optional: Database connectivity test
