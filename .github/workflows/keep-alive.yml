@@ -70,17 +70,21 @@ jobs:
             exit 1
           fi
 
-      # Optional: Slack notification on failure
-      # To enable: Add SLACK_WEBHOOK_URL secret in your repository settings
-      # Go to: Settings > Secrets and variables > Actions > New repository secret
-      - name: Notify on Failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          channel: '#alerts'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        continue-on-error: true
+      # Note: To enable Slack notifications on failure:
+      # 1. Go to your repository Settings
+      # 2. Navigate to Secrets and variables > Actions
+      # 3. Add new repository secret: SLACK_WEBHOOK_URL
+      # 4. Set the value to your Slack webhook URL
+      # 5. Uncomment and modify the Slack notification step below
+       
+      # - name: Notify on Failure
+      #   if: failure()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     channel: '#alerts'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #   continue-on-error: true
 
   # Optional: Database connectivity test
   db-test:
